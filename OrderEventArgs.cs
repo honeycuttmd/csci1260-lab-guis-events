@@ -1,16 +1,18 @@
 namespace GuiEventsLab;
 
-// OrderEventArgs: the details that travel with an order event.
-// Every handler receives one of these as its e parameter.
-//
-// Part A. Write the constructor along with the Session 1 demo.
+/// <summary>
+/// Stores the order information passed to event handlers.
+/// </summary>
 public class OrderEventArgs : EventArgs
 {
     public Order Order { get; }
 
+    /// <summary>
+    /// Initializes the event arguments with the specified order.
+    /// </summary>
+    /// <param name="order">The order associated with the event.</param>
     public OrderEventArgs(Order order)
     {
-        // TODO: Part A, demo
-        throw new NotImplementedException();
+        Order = order;
     }
 }

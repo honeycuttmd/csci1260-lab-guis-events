@@ -1,50 +1,66 @@
 namespace GuiEventsLab;
 
-// CoffeeBar: the publisher. It takes orders, makes them in the order they
-// arrived, and announces what happened. It never knows who is listening.
-//
-// Part A. Write Place and FinishNext along with the Session 1 demo.
-// Raising AllCaughtUp inside FinishNext is Exercise 1.
+/// <summary>
+/// Manages customer orders and announces changes through events.
+/// </summary>
 public class CoffeeBar
 {
     private readonly Queue<Order> waiting = new Queue<Order>();
     private int nextNumber = 1;
-
-    // Given. Raised after an order joins the line.
     public event EventHandler<OrderEventArgs>? OrderPlaced;
-
-    // Given. Raised after an order leaves the line, ready for pickup.
     public event EventHandler<OrderEventArgs>? OrderReady;
-
-    // Given. Raised after the last waiting order is finished. Exercise 1.
     public event EventHandler? AllCaughtUp;
 
-    // Given.
     public int WaitingCount
     {
         get { return waiting.Count; }
     }
 
-    // Given. A copy of the line, oldest first, so callers can show it
-    // but not change it.
+    /// <summary>
+    /// Returns a copy of the waiting orders in the order they were placed.
+    /// </summary>
+    /// <returns>A list of orders currently waiting.</returns>
     public List<Order> Waiting()
     {
         return new List<Order>(waiting);
     }
 
-    // Build the order, put it in line, then announce it. Return the order.
+    /// <summary>
+    /// Creates a new order, adds it to the queue, and announces that it was placed.
+    /// </summary>
+    /// <param name="customer">The name of the customer placing the order.</param>
+    /// <param name="drink">The drink being ordered.</param>
+    /// <returns>The newly placed order.</returns>
     public Order Place(string customer, string drink)
     {
-        // TODO: Part A, demo
-        throw new NotImplementedException();
+        Order order = new Order(nextNumber, customer, drink);
+        nextNumber++;
+
+        waiting.Enqueue(order);
+        OrderPlaced?.Invoke(this, new OrderEventArgs(order));
+
+        return order;
     }
 
-    // Take the oldest order out of line, then announce it. Return the order.
-    // Refuse with an InvalidOperationException when nothing is waiting.
+    /// <summary>
+    /// Finishes the oldest order and announces when the queue becomes empty.
+    /// </summary>
+    /// <returns>The order that was completed.</returns>
     public Order FinishNext()
     {
-        // TODO: Part A, demo. Then Exercise 1: announce AllCaughtUp when
-        // the order you just finished was the last one in line.
-        throw new NotImplementedException();
+        if (waiting.Count == 0)
+        {
+            throw new InvalidOperationException("No orders are waiting.");
+        }
+
+        Order order = waiting.Dequeue();
+        OrderReady?.Invoke(this, new OrderEventArgs(order));
+
+        if (waiting.Count == 0)
+        {
+            AllCaughtUp?.Invoke(this, EventArgs.Empty);
+        }
+
+        return order;
     }
 }
