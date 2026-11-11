@@ -3,22 +3,23 @@ using Avalonia.Interactivity;
 
 namespace GuiEventsLab;
 
-// MainWindow: the code behind the window. It shows the coffee bar and asks
-// it to do things. Every decision about orders stays in CoffeeBar.
-//
-// Part C and Part D are written along with the Session 2 demos.
-// Exercise 3 and Exercise 4 are yours.
+/// <summary>
+/// Displays the coffee bar and handles order placement and pickup events.
+/// </summary>
 public partial class MainWindow : Window
 {
     private readonly CoffeeBar bar = new CoffeeBar();
 
+    /// <summary>
+    /// Initializes the window and subscribes to coffee bar events.
+    /// </summary>
     public MainWindow()
     {
         InitializeComponent();
 
-        // TODO: Part C, demo. Subscribe to bar.OrderPlaced.
-
-        // TODO: Exercise 3. Subscribe to bar.OrderReady and bar.AllCaughtUp.
+        bar.OrderPlaced += OnOrderPlaced;
+        bar.OrderReady += OnOrderReady;
+        bar.AllCaughtUp += OnAllCaughtUp;
 
         // TODO: Part D, demo. Subscribe to TextChanged on both boxes,
         // then set the buttons for an empty window.
@@ -27,14 +28,78 @@ public partial class MainWindow : Window
         // subscribe to its FreeDrinkEarned event.
     }
 
-    // placeholders
+    /// <summary>
+    /// Places an order using the customer and drink entered in the text boxes.
+    /// </summary>
+    /// <param name="sender">The button that raised the event.</param>
+    /// <param name="e">The button click event arguments.</param>
     private void PlaceButton_Click(object? sender, RoutedEventArgs e)
     {
+        try
+        {
+            bar.Place(CustomerBox.Text ?? "", DrinkBox.Text ?? "");
 
+            CustomerBox.Text = "";
+            DrinkBox.Text = "";
+            StatusText.Text = "";
+        }
+        catch (ArgumentException ex)
+        {
+            StatusText.Text = ex.Message;
+        }
     }
 
+    /// <summary>
+    /// Finishes the next waiting order.
+    /// </summary>
+    /// <param name="sender">The button that raised the event.</param>
+    /// <param name="e">The button click event arguments.</param>
     private void ReadyButton_Click(object? sender, RoutedEventArgs e)
     {
+        bar.FinishNext();
+    }
 
+    /// <summary>
+    /// Updates the waiting list when a new order is placed.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The order information associated with the event.</param>
+    private void OnOrderPlaced(object? sender, OrderEventArgs e)
+    {
+        ShowWaiting();
+    }
+
+    /// <summary>
+    /// Adds a completed order to the pickup list and refreshes the waiting list.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The order information associated with the event.</param>
+    private void OnOrderReady(object? sender, OrderEventArgs e)
+    {
+        PickupList.Items.Add($"#{e.Order.Number} {e.Order.Customer}");
+        ShowWaiting();
+    }
+
+    /// <summary>
+    /// Displays a message when all waiting orders have been completed.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnAllCaughtUp(object? sender, EventArgs e)
+    {
+        StatusText.Text = "All caught up.";
+    }
+
+    /// <summary>
+    /// Refreshes the waiting list to show all orders currently in the queue.
+    /// </summary>
+    private void ShowWaiting()
+    {
+        WaitingList.Items.Clear();
+
+        foreach (Order order in bar.Waiting())
+        {
+            WaitingList.Items.Add(order.ToString());
+        }
     }
 }
