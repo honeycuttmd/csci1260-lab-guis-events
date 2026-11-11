@@ -3,13 +3,43 @@
         x:Class="GuiEventsLab.MainWindow"
         Title="Corner Cup" Width="560" Height="430">
 
-  <!-- TODO: Part C, demo. Build the window inside this StackPanel.
-       The handout lists every control and the exact x:Name the check
-       looks for. A name that is spelled differently is a control the
-       check cannot find. -->
-  <StackPanel Margin="20" Spacing="12">
+	<StackPanel Margin="20" Spacing="12">
 
-    <TextBlock Text="Corner Cup" FontSize="24" FontWeight="Bold"/>
+		<TextBlock Text="Corner Cup" FontSize="24" FontWeight="Bold"/>
 
-  </StackPanel>
+		<StackPanel Orientation="Horizontal" Spacing="10">
+			<TextBox x:Name="CustomerBox"
+					 PlaceholderText="Name"
+					 Width="150"/>
+			<TextBox x:Name="DrinkBox"
+					 PlaceholderText="Drink"
+					 Width="150"/>
+			<Button x:Name="PlaceButton"
+					Content="Place order"
+					Click="PlaceButton_Click"/>
+		</StackPanel>
+
+		<Grid ColumnDefinitions="*,*" RowDefinitions="Auto,170"
+			  ColumnSpacing="12">
+			<TextBlock Grid.Row="0" Grid.Column="0"
+					   Text="Waiting" FontWeight="Bold"/>
+			<TextBlock Grid.Row="0" Grid.Column="1"
+					   Text="Ready for pickup" FontWeight="Bold"/>
+
+			<ListBox x:Name="WaitingList"
+					 Grid.Row="1" Grid.Column="0"/>
+			<ListBox x:Name="PickupList"
+					 Grid.Row="1" Grid.Column="1"/>
+		</Grid>
+
+		<Button x:Name="ReadyButton"
+				Content="Mark next ready"
+				Click="ReadyButton_Click"/>
+
+		<TextBlock x:Name="StatusText" Text=""/>
+
+		<TextBlock x:Name="RewardText"
+				   FontWeight="SemiBold" Text=""/>
+
+	</StackPanel>
 </Window>

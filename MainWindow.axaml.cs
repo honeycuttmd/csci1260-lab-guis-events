@@ -27,6 +27,14 @@ public partial class MainWindow : Window
         // subscribe to its FreeDrinkEarned event.
     }
 
-    // Write the click handlers, the event handlers, and the helper
-    // methods below this line.
+    // placeholders
+    private void PlaceButton_Click(object? sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void ReadyButton_Click(object? sender, RoutedEventArgs e)
+    {
+
+    }
 }
