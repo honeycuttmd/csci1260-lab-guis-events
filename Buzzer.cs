@@ -1,37 +1,46 @@
 namespace GuiEventsLab;
 
-// Buzzer: a subscriber that can also stop listening. It records the
-// messages a customer's phone would show, like
-// "Buzz: Ada, your latte is ready."
-//
-// Part B. Write Connect, Disconnect, and OnOrderReady along with the
-// Session 1 demo.
+/// <summary>
+/// Records drink notifications and allows them to be enabled or disabled.
+/// </summary>
 public class Buzzer
 {
     private readonly List<string> messages = new List<string>();
 
-    // Given.
+    /// <summary>
+    /// Returns a copy of the buzzer messages.
+    /// </summary>
+    /// <returns>A list of drink notifications.</returns>
     public List<string> Messages()
     {
         return new List<string>(messages);
     }
 
+    /// <summary>
+    /// Subscribes to the coffee bar's OrderReady event.
+    /// </summary>
+    /// <param name="bar">The coffee bar to listen to.</param>
     public void Connect(CoffeeBar bar)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        bar.OrderReady += OnOrderReady;
     }
 
-    // Unsubscribe with the same method that subscribed.
+    /// <summary>
+    /// Unsubscribes from the coffee bar's OrderReady event.
+    /// </summary>
+    /// <param name="bar">The coffee bar to stop listening to.</param>
     public void Disconnect(CoffeeBar bar)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        bar.OrderReady -= OnOrderReady;
     }
 
+    /// <summary>
+    /// Adds a buzzer message when an order is ready.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The order information associated with the event.</param>
     private void OnOrderReady(object? sender, OrderEventArgs e)
     {
-        // TODO: Part B, demo
-        throw new NotImplementedException();
+        messages.Add($"Buzz: {e.Order.Customer}, your {e.Order.Drink} is ready.");
     }
 }

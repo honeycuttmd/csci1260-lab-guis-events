@@ -1,32 +1,54 @@
 namespace GuiEventsLab;
 
-// Rewards: a subscriber that is also a publisher. It counts finished drinks
-// for each customer and announces FreeDrinkEarned on every third one.
-//
-// Exercise 2. Write Connect and a private handler named OnOrderReady.
+/// <summary>
+/// Tracks completed drinks and announces when a customer earns a free drink.
+/// </summary>
 public class Rewards
 {
     public const int DrinksPerReward = 3;
-
     private readonly Dictionary<string, int> drinks = new Dictionary<string, int>();
-
-    // Given. Raise it with the same OrderEventArgs the bar sent you.
     public event EventHandler<OrderEventArgs>? FreeDrinkEarned;
 
-    // Given.
+    /// <summary>
+    /// Returns the number of completed drinks for a customer.
+    /// </summary>
+    /// <param name="customer">The customer to look up.</param>
+    /// <returns>The number of completed drinks for the customer.</returns>
     public int DrinksFor(string customer)
     {
         return drinks.GetValueOrDefault(customer);
     }
 
-    // Subscribe your handler to the bar's OrderReady event.
+    /// <summary>
+    /// Subscribes to the coffee bar's OrderReady event.
+    /// </summary>
+    /// <param name="bar">The coffee bar to listen to.</param>
     public void Connect(CoffeeBar bar)
     {
-        // TODO: Exercise 2
-        throw new NotImplementedException();
+        bar.OrderReady += OnOrderReady;
     }
 
-    // TODO: Exercise 2. Write the handler here. Add one to the customer's
-    // count, and when the count reaches a multiple of DrinksPerReward,
-    // raise FreeDrinkEarned.
+    /// <summary>
+    /// Counts completed drinks and announces every third drink for a customer.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The order information associated with the event.</param>
+    private void OnOrderReady(object? sender, OrderEventArgs e)
+    {
+        string customer = e.Order.Customer;
+
+        if (drinks.ContainsKey(customer))
+        {
+            drinks[customer]++;
+        }
+        else
+        {
+            drinks[customer] = 1;
+        }
+
+        if (drinks[customer] % DrinksPerReward == 0)
+        {
+            FreeDrinkEarned?.Invoke(this, e);
+        }
+    }
 }
