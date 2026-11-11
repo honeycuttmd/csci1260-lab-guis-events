@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GuiEventsLab.MainWindow"
+        Title="Corner Cup" Width="560" Height="430">
+
+  <!-- TODO: Part C, demo. Build the window inside this StackPanel.
+       The handout lists every control and the exact x:Name the check
+       looks for. A name that is spelled differently is a control the
+       check cannot find. -->
+  <StackPanel Margin="20" Spacing="12">
+
+    <TextBlock Text="Corner Cup" FontSize="24" FontWeight="Bold"/>
+
+  </StackPanel>
+</Window>

@@ -1,0 +1,42 @@
+=== CSCI 1260 GUIS AND EVENTS LAB ===
+
+Part A: the coffee bar announces
+  Place Ada, latte:               #1 Ada, latte
+  Place Ben, mocha:               #2 Ben, mocha
+  Place a blank name:             refused: Customer name is required.
+  OrderPlaced heard:              #1 (waiting 1), #2 (waiting 2)
+  FinishNext:                     #1 Ada, latte
+  AllCaughtUp heard:              0 times
+  FinishNext:                     #2 Ben, mocha
+  AllCaughtUp heard:              1 time
+  OrderReady heard:               #1 (waiting 1), #2 (waiting 0)
+  FinishNext when empty:          refused: No orders are waiting.
+
+Part B: listeners
+  Pickup screen:
+    Ready: #1 Ada
+    Ready: #2 Ben
+    Ready: #3 Cy
+  Buzzer, disconnected after #1:
+    Buzz: Ada, your latte is ready.
+  Rewards, Cy orders three times:
+    Drinks for Ada, Cy:           1 3
+    FreeDrinkEarned heard:        Cy on #4
+
+Part C: the window
+  Place Ada, latte:               #1 Ada, latte
+  Boxes after Place:              (blank) (blank)
+  Place Ben, mocha:               #1 Ada, latte | #2 Ben, mocha
+  Click Ready:                    #1 Ada
+  Click Ready again:              #1 Ada | #2 Ben
+  Waiting list:                   (empty)
+  Status:                         All caught up.
+
+Part D: buttons that know when they can work
+  Place enabled, boxes empty:     False
+  Place enabled, name only:       False
+  Place enabled, name and drink:  True
+  Ready enabled, none waiting:    False
+  Ready enabled, one waiting:     True
+  Ready enabled, all finished:    False
+  Reward text:                    Free drink earned: Cy

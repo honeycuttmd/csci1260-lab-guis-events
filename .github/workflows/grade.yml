@@ -1,0 +1,76 @@
+# Build and Check Output
+#
+# GitHub runs this file every time you push. It downloads your repository
+# onto a fresh Linux machine, builds your project, runs it, and compares
+# what your program printed to the expected output for this assignment.
+#
+# You do not need to change anything in this file. The expected output
+# lives next door in .github/expected_output.txt.
+#
+# A green check on the repository page means your program built and its
+# output matched. A red X means something did not. Click the X to read why.
+
+name: Build and Check Output
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Build, run, and compare
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Download this repository onto the runner
+        uses: actions/checkout@v7
+
+      - name: Install the .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Find the project file
+        id: project
+        run: |
+          PROJECT=$(find . -name '*.csproj' -not -path '*/bin/*' -not -path '*/obj/*' | sort | head -n 1)
+          if [ -z "$PROJECT" ]; then
+            echo "::error::No .csproj file was found. Make sure the project file is committed and pushed."
+            exit 1
+          fi
+          echo "Using $PROJECT"
+          echo "path=$PROJECT" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        run: dotnet build "${{ steps.project.outputs.path }}" --configuration Release --nologo
+
+      - name: Run the program and save what it printed
+        env:
+          DOTNET_ROLL_FORWARD: Major
+        run: |
+          set +e
+          dotnet run --project "${{ steps.project.outputs.path }}" --configuration Release --no-build < /dev/null > actual_output.txt 2> errors.txt
+          EXIT_CODE=$?
+          set -e
+          echo "----- What your program printed -----"
+          cat actual_output.txt
+          echo "-------------------------------------"
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "::warning::Your program stopped with exit code $EXIT_CODE. The message below says why."
+            cat errors.txt
+          fi
+
+      - name: Compare with the expected output
+        run: |
+          sed -i '1s/^\xEF\xBB\xBF//' .github/expected_output.txt
+          if diff --strip-trailing-cr .github/expected_output.txt actual_output.txt > differences.txt; then
+            echo "Your output matches the expected output exactly."
+          else
+            echo "::error::The output does not match. Lines starting with < are expected. Lines starting with > are what your program printed."
+            cat differences.txt
+            exit 1
+          fi
