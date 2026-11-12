@@ -9,6 +9,7 @@ namespace GuiEventsLab;
 public partial class MainWindow : Window
 {
     private readonly CoffeeBar bar = new CoffeeBar();
+    private readonly Rewards rewards = new Rewards();
 
     /// <summary>
     /// Initializes the window and subscribes to coffee bar events.
@@ -21,11 +22,13 @@ public partial class MainWindow : Window
         bar.OrderReady += OnOrderReady;
         bar.AllCaughtUp += OnAllCaughtUp;
 
-        // TODO: Part D, demo. Subscribe to TextChanged on both boxes,
-        // then set the buttons for an empty window.
+        CustomerBox.TextChanged += Boxes_TextChanged;
+        DrinkBox.TextChanged += Boxes_TextChanged;
 
-        // TODO: Exercise 4. Connect a Rewards object to the bar and
-        // subscribe to its FreeDrinkEarned event.
+        rewards.Connect(bar);
+        rewards.FreeDrinkEarned += OnFreeDrinkEarned;
+
+        UpdateButtons();
     }
 
     /// <summary>
@@ -67,6 +70,7 @@ public partial class MainWindow : Window
     private void OnOrderPlaced(object? sender, OrderEventArgs e)
     {
         ShowWaiting();
+        UpdateButtons();
     }
 
     /// <summary>
@@ -77,7 +81,9 @@ public partial class MainWindow : Window
     private void OnOrderReady(object? sender, OrderEventArgs e)
     {
         PickupList.Items.Add($"#{e.Order.Number} {e.Order.Customer}");
+
         ShowWaiting();
+        UpdateButtons();
     }
 
     /// <summary>
@@ -101,5 +107,37 @@ public partial class MainWindow : Window
         {
             WaitingList.Items.Add(order.ToString());
         }
+    }
+
+    /// <summary>
+    /// Updates the Place and Ready buttons based on the current input and waiting orders.
+    /// </summary>
+    private void UpdateButtons()
+    {
+        PlaceButton.IsEnabled =
+            !string.IsNullOrWhiteSpace(CustomerBox.Text) &&
+            !string.IsNullOrWhiteSpace(DrinkBox.Text);
+
+        ReadyButton.IsEnabled = bar.WaitingCount > 0;
+    }
+
+    /// <summary>
+    /// Updates button states when a customer or drink changes.
+    /// </summary>
+    /// <param name="sender">The text box that raised the event.</param>
+    /// <param name="e">The text changed event arguments.</param>
+    private void Boxes_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        UpdateButtons();
+    }
+
+    /// <summary>
+    /// Displays a notification when a customer earns a free drink.
+    /// </summary>
+    /// <param name="sender">The object that raised the event.</param>
+    /// <param name="e">The order information associated with the event.</param>
+    private void OnFreeDrinkEarned(object? sender, OrderEventArgs e)
+    {
+        RewardText.Text = $"Free drink earned: {e.Order.Customer}";
     }
 }
